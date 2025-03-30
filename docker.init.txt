@@ -4,11 +4,11 @@ docker-compose down
 
 Empaquetar el backend (si es necesario) -----------------------------------------------------------
 
-./mvnw package
+./mvnw clean package -DskipTests
 
 Para asegurarte de que todos los cambios se apliquen, reconstruye las imágenes --------------------
 
-docker-compose build
+docker-compose up --build
 
 Inicia los servicios en segundo plano -------------------------------------------------------------
 
