@@ -1,19 +1,48 @@
-Antes de reiniciar los servicios, detén y elimina los contenedores existentes: --------------------
+#(SUCCESS) ejecuta tranquilamente -----------------------------------------------------------------
 
+
+
+# 1. Limpiar y reconstruir el proyecto
+# Este comando compila el proyecto y genera un nuevo archivo .jar, saltando las pruebas unitarias.
+cd backend
+./mvnw clean package -DskipTests
+cd ..
+
+# 2. Detener los contenedores actuales
+# Detiene y elimina los contenedores definidos en el archivo docker-compose.yml, pero mantiene los volúmenes (datos persistentes).
 docker-compose down
 
-Empaquetar el backend (si es necesario) -----------------------------------------------------------
-
-./mvnw clean package -DskipTests
-
-Para asegurarte de que todos los cambios se apliquen, reconstruye las imágenes --------------------
-
+# 3. Reconstruir las imágenes Docker
+# Reconstruye las imágenes Docker desde cero y levanta los contenedores.
 docker-compose up --build
 
-Inicia los servicios en segundo plano -------------------------------------------------------------
+# 4. Verificar el estado de los contenedores
+# Muestra una lista de los contenedores en ejecución para confirmar que todo esté funcionando correctamente.
+docker ps
 
-docker-compose up -d
 
-Revisa el estado de los contenedores --------------------------------------------------------------
 
-docker-compose ps
+#(COPY) copia y ejecuta tranquilamente ------------------------------------------------------------
+
+
+
+cd backend
+./mvnw clean package -DskipTests
+cd ..
+docker-compose down
+docker-compose up --build
+docker ps
+
+
+
+#(WARNING) comandos de precaucion -----------------------------------------------------------------
+
+
+
+# a. Este comando detiene y elimina todos los contenedores, redes y volúmenes definidos en el archivo docker-compose.yml
+# ¡Advertencia! Este comando elimina los datos persistentes (como los de la base de datos). Úsalo solo si deseas comenzar con una base de datos limpia.
+docker-compose down --volumes
+
+# b. Este comando es más agresivo y asegura que no haya conflictos con imágenes o contenedores antiguos
+# ¡Advertencia! Este comando limpia completamente el entorno Docker, eliminando todas las imágenes, contenedores, redes y volúmenes no utilizados. Úsalo solo si necesitas resolver problemas relacionados con caché o residuos.
+docker system prune -a --volumes
