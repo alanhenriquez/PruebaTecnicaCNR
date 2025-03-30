@@ -1,0 +1,101 @@
+
+
+
+#BACKEND ------------------------------------------------------------------------------------------
+
+
+
+#Maven
+backend/target/
+backend/pom.xml.tag
+backend/pom.xml.releaseBackup
+backend/pom.xml.versionsBackup
+backend/release.properties
+backend/.flattened-pom.xml
+
+# Eclipse
+backend/.project
+backend/.classpath
+backend/.settings/
+backend/bin/
+
+# IntelliJ
+backend/.idea
+backend/*.ipr
+backend/*.iml
+backend/*.iws
+
+# NetBeans
+backend/nb-configuration.xml
+
+# Visual Studio Code
+backend/.vscode
+backend/.factorypath
+
+# OSX
+backend/.DS_Store
+
+# Vim
+backend/*.swp
+backend/*.swo
+
+# patch
+backend/*.orig
+backend/*.rej
+
+# Local environment
+backend/.env
+
+# Plugin directory
+backend/.quarkus/cli/plugins/
+# TLS Certificates
+backend/.certs/
+
+
+
+#FRONTEND -----------------------------------------------------------------------------------------
+
+
+
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+frontend/dist
+frontend/tmp
+frontend/out-tsc
+frontend/bazel-out
+
+# Node
+frontend/node_modules
+frontend/npm-debug.log
+frontend/yarn-error.log
+
+# IDEs and editors
+frontend/.idea/
+frontend/.project
+frontend/.classpath
+frontend/.c9/
+frontend/*.launch
+frontend/.settings/
+frontend/*.sublime-workspace
+
+# Visual Studio Code
+frontend/.vscode/*
+frontend/!.vscode/settings.json
+frontend/!.vscode/tasks.json
+frontend/!.vscode/launch.json
+frontend/!.vscode/extensions.json
+frontend/.history/*
+
+# Miscellaneous
+frontend/.angular/cache
+frontend/.sass-cache/
+frontend/connect.lock
+frontend/coverage
+frontend/libpeerconnection.log
+frontend/testem.log
+frontend/typings
+
+# System files
+frontend/.DS_Store
+frontend/Thumbs.db

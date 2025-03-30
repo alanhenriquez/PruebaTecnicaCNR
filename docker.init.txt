@@ -1,0 +1,19 @@
+Antes de reiniciar los servicios, detén y elimina los contenedores existentes: --------------------
+
+docker-compose down
+
+Empaquetar el backend (si es necesario) -----------------------------------------------------------
+
+./mvnw package
+
+Para asegurarte de que todos los cambios se apliquen, reconstruye las imágenes --------------------
+
+docker-compose build
+
+Inicia los servicios en segundo plano -------------------------------------------------------------
+
+docker-compose up -d
+
+Revisa el estado de los contenedores --------------------------------------------------------------
+
+docker-compose ps
