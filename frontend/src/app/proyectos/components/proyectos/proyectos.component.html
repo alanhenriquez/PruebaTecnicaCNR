@@ -1,3 +1,51 @@
+<!-- Formulario para crear un nuevo proyecto -->
+<div style="margin-bottom: 20px; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
+  <h3>Crear Nuevo Proyecto</h3>
+  <form (ngSubmit)="crearNuevoProyecto()" #proyectoForm="ngForm">
+    <!-- Campo UUID -->
+    <div class="mb-3">
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi pi-id-card"></i>
+        </p-inputgroup-addon>
+        <input pInputText type="text" id="uuid" name="uuid" [(ngModel)]="nuevoProyecto.uuid" required placeholder="UUID" />
+      </p-inputgroup>
+    </div>
+
+    <!-- Campo Nombre -->
+    <div class="mb-3">
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi pi-pencil"></i>
+        </p-inputgroup-addon>
+        <input pInputText type="text" id="nombre" name="nombre" [(ngModel)]="nuevoProyecto.nombre" required placeholder="Nombre del Proyecto" />
+      </p-inputgroup>
+    </div>
+
+    <!-- Campo Fecha Creación -->
+    <div class="mb-3">
+      <p-inputgroup>
+        <p-inputgroup-addon>
+          <i class="pi pi-calendar"></i>
+        </p-inputgroup-addon>
+        <input pInputText type="datetime-local" id="fechaCreacion" name="fechaCreacion" [(ngModel)]="nuevoProyecto.fechaCreacion" required />
+      </p-inputgroup>
+    </div>
+
+    <!-- Campo Estado -->
+    <div class="mb-3">
+      <p-inputgroup>
+        <p-inputgroup-addon>Estado</p-inputgroup-addon>
+        <p-select [(ngModel)]="nuevoProyecto.estado" [options]="estados" optionLabel="label" placeholder="Selecciona Estado" required></p-select>
+      </p-inputgroup>
+    </div>
+
+    <!-- Botón para enviar el formulario -->
+     <app-button-demo [onClick]="crearNuevoProyecto"></app-button-demo>
+  </form>
+</div>
+
+<!-- Tabla TreeTable -->
 <p-treetable 
   [value]="proyectos" 
   [columns]="cols" 
@@ -15,7 +63,7 @@
     </tr>
   </ng-template>
   <ng-template #body let-rowNode let-rowData="rowData" let-columns="columns">
-    <tr [ttRow]="rowNode">
+    <tr [ttRow]="rowNode" (click)="onRowClick(rowNode)">
       <td *ngFor="let col of columns; let i = index">
         <p-treeTableToggler [rowNode]="rowNode" *ngIf="i === 0" />
         {{ rowData[col.field] }}

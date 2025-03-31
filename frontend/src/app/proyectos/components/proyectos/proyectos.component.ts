@@ -4,21 +4,41 @@ import { HttpClientModule } from '@angular/common/http';
 import { TreeTableModule } from 'primeng/treetable';
 import { TreeNode } from 'primeng/api';
 import { ProyectosService } from '../../services/proyectos.service';
+import { FormsModule } from '@angular/forms';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { ButtonDemoComponent } from "../../../common/button-demo/button-demo.component";
 
 @Component({
   selector: 'app-proyectos',
-  standalone: true, // Marcar el componente como standalone
+  standalone: true,
   imports: [
     CommonModule,
-    HttpClientModule, // Para realizar solicitudes HTTP
-    TreeTableModule // Para usar TreeTable de PrimeNG
-  ],
+    HttpClientModule,
+    TreeTableModule,
+    FormsModule,
+    InputGroupModule,
+    InputGroupAddonModule,
+    InputTextModule,
+    SelectModule,
+    ButtonDemoComponent
+],
   templateUrl: './proyectos.component.html',
   styleUrls: ['./proyectos.component.css']
 })
 export class ProyectosComponent implements OnInit {
   proyectos: TreeNode[] = []; // Datos formateados para TreeTable
   cols: any[] = []; // Columnas de la tabla
+  selectedNode: TreeNode | null = null; // Nodo seleccionado actualmente
+  nuevoProyecto: any = {}; // Objeto para almacenar los datos del nuevo proyecto
+
+  // Opciones para el campo "Estado"
+  estados = [
+    { label: 'Activo', value: true },
+    { label: 'Inactivo', value: false }
+  ];
 
   constructor(private proyectosService: ProyectosService) {}
 
@@ -39,6 +59,44 @@ export class ProyectosComponent implements OnInit {
     });
   }
 
+  // Callback para manejar el evento de clic en una fila
+  onRowClick(nodes: any): void {
+    const parentId = nodes.node.data.codigoProyecto; // Obtener el ID del padre desde los datos del nodo
+    if (parentId) {
+      console.log('ID del padre:', parentId);
+    } else {
+      console.log('Este nodo no tiene padre (es un nodo raíz).');
+    }
+  }
+
+  // Método para crear un nuevo proyecto
+  crearNuevoProyecto(): void {
+    this.proyectosService.crearProyecto(this.nuevoProyecto).subscribe((response) => {
+      console.log('Proyecto creado:', response);
+
+      // Agregar el nuevo proyecto a la lista de proyectos
+      const nuevoNodo: TreeNode = {
+        data: {
+          seleccion: false,
+          codigoProyecto: response.codigoProyecto,
+          uuid: response.uuid,
+          nombre: response.nombre,
+          fechaCreacion: response.fechaCreacion,
+          estado: response.estado ? 'Activo' : 'Inactivo',
+          codigoProyectoDetalle: '',
+          descripcion: '',
+          area: '',
+          estadoDetalle: '',
+          parentId: null
+        },
+        children: []
+      };
+
+      this.proyectos.push(nuevoNodo);
+      this.nuevoProyecto = {}; // Limpiar el formulario
+    });
+  }
+
   // Transforma los datos de la API en un formato compatible con TreeTable
   formatDataToTree(data: any[]): TreeNode[] {
     const nodes: TreeNode[] = [];
@@ -46,17 +104,19 @@ export class ProyectosComponent implements OnInit {
     data.forEach((proyecto) => {
       const proyectoNode: TreeNode = {
         data: {
+          seleccion: false,
           codigoProyecto: proyecto.codigoProyecto,
           uuid: proyecto.uuid,
           nombre: proyecto.nombre,
           fechaCreacion: proyecto.fechaCreacion,
           estado: proyecto.estado ? 'Activo' : 'Inactivo',
-          codigoProyectoDetalle: '', // Vacío para el nivel de proyecto
-          descripcion: '', // Vacío para el nivel de proyecto
-          area: '', // Vacío para el nivel de proyecto
-          estadoDetalle: '' // Vacío para el nivel de proyecto
+          codigoProyectoDetalle: '',
+          descripcion: '',
+          area: '',
+          estadoDetalle: '',
+          parentId: null
         },
-        children: this.processDetalles(proyecto.detalles)
+        children: this.processDetalles(proyecto.detalles, proyecto.uuid)
       };
 
       nodes.push(proyectoNode);
@@ -66,20 +126,22 @@ export class ProyectosComponent implements OnInit {
   }
 
   // Función auxiliar para procesar los detalles de cada proyecto
-  processDetalles(detalles: any[]): TreeNode[] {
+  processDetalles(detalles: any[], parentId: string): TreeNode[] {
     if (!detalles || detalles.length === 0) {
       return [
         {
           data: {
-            codigoProyecto: '', // Vacío para el nivel de detalle sin datos
-            uuid: '', // Vacío para el nivel de detalle sin datos
-            nombre: 'Sin detalles', // Mensaje personalizado
-            fechaCreacion: '', // Vacío para el nivel de detalle sin datos
-            estado: '', // Vacío para el nivel de detalle sin datos
-            codigoProyectoDetalle: '', // Vacío para el nivel de detalle sin datos
-            descripcion: '', // Vacío para el nivel de detalle sin datos
-            area: '', // Vacío para el nivel de detalle sin datos
-            estadoDetalle: '' // Vacío para el nivel de detalle sin datos
+            seleccion: false,
+            codigoProyecto: '',
+            uuid: '',
+            nombre: 'Sin detalles',
+            fechaCreacion: '',
+            estado: '',
+            codigoProyectoDetalle: '',
+            descripcion: '',
+            area: '',
+            estadoDetalle: '',
+            parentId: parentId
           }
         }
       ];
@@ -87,15 +149,17 @@ export class ProyectosComponent implements OnInit {
 
     return detalles.map((detalle) => ({
       data: {
-        codigoProyecto: '', // Vacío para el nivel de detalle
-        uuid: '', // Vacío para el nivel de detalle
-        nombre: '', // Vacío para el nivel de detalle
-        fechaCreacion: '', // Vacío para el nivel de detalle
-        estado: '', // Vacío para el nivel de detalle
+        seleccion: false,
+        codigoProyecto: '',
+        uuid: '',
+        nombre: '',
+        fechaCreacion: '',
+        estado: '',
         codigoProyectoDetalle: detalle.codigoProyectoDetalle,
         descripcion: detalle.descripcion,
         area: detalle.area,
-        estadoDetalle: detalle.estado ? 'Activo' : 'Inactivo'
+        estadoDetalle: detalle.estado ? 'Activo' : 'Inactivo',
+        parentId: parentId
       }
     }));
   }
