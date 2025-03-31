@@ -297,7 +297,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ProyectoDTO {
-
     private Long codigoProyecto;
     private UUID uuid;
     private String nombre;
@@ -315,6 +314,7 @@ public class ProyectoDTO {
         this.estado = estado;
     }
 
+    // Getters y setters
     public Long getCodigoProyecto() {
         return codigoProyecto;
     }
@@ -612,6 +612,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ProyectoService {
@@ -621,28 +622,33 @@ public class ProyectoService {
      * Este método es transaccional para garantizar la integridad de los datos.
      */
     @Transactional
-    public Proyecto crearProyecto(ProyectoDTO proyectoDTO) {
+    public ProyectoDTO crearProyecto(ProyectoDTO proyectoDTO) {
         Proyecto proyecto = new Proyecto();
         proyecto.setUuid(UUID.randomUUID());
         proyecto.setNombre(proyectoDTO.getNombre());
         proyecto.setFechaCreacion(LocalDateTime.now());
         proyecto.setEstado(proyectoDTO.getEstado());
         proyecto.persist();
-        return proyecto;
+
+        // Devolver un ProyectoDTO en lugar de Proyecto
+        return convertirAProyectoDTO(proyecto);
     }
 
     /**
      * Obtiene todos los proyectos almacenados en la base de datos.
      */
-    public List<Proyecto> obtenerTodosLosProyectos() {
-        return Proyecto.listAll();
+    public List<ProyectoDTO> obtenerTodosLosProyectos() {
+        return Proyecto.listAll().stream()
+                .map(proyecto -> convertirAProyectoDTO((Proyecto) proyecto)) // Convertir explícitamente a Proyecto
+                .collect(Collectors.toList());
     }
 
     /**
      * Obtiene un proyecto por su ID.
      */
-    public Optional<Proyecto> obtenerProyectoPorId(Long id) {
-        return Proyecto.findByIdOptional(id);
+    public Optional<ProyectoDTO> obtenerProyectoPorId(Long id) {
+        return Proyecto.findByIdOptional(id)
+                .map(proyecto -> convertirAProyectoDTO((Proyecto) proyecto)); // Convertir explícitamente a Proyecto
     }
 
     /**
@@ -650,13 +656,13 @@ public class ProyectoService {
      * Este método es transaccional para garantizar la integridad de los datos.
      */
     @Transactional
-    public Proyecto actualizarProyecto(Long id, ProyectoDTO proyectoDTO) {
+    public ProyectoDTO actualizarProyecto(Long id, ProyectoDTO proyectoDTO) {
         Optional<Proyecto> optionalProyecto = Proyecto.findByIdOptional(id);
         if (optionalProyecto.isPresent()) {
             Proyecto proyecto = optionalProyecto.get();
             proyecto.setNombre(proyectoDTO.getNombre());
             proyecto.setEstado(proyectoDTO.getEstado());
-            return proyecto;
+            return convertirAProyectoDTO(proyecto);
         }
         return null;
     }
@@ -678,7 +684,8 @@ public class ProyectoService {
 
     /**
      * Inicializa datos predeterminados en la base de datos si no hay proyectos.
-     * Este método es transaccional para garantizar que todos los proyectos predeterminados
+     * Este método es transaccional para garantizar que todos los proyectos
+     * predeterminados
      * se creen correctamente o ninguno se cree en caso de error.
      */
     @Transactional
@@ -686,12 +693,26 @@ public class ProyectoService {
         long count = Proyecto.count();
         if (count == 0) {
             // Crear proyectos predeterminados
-            ProyectoDTO proyecto1 = new ProyectoDTO(null, UUID.randomUUID(), "Proyecto Inicial 1", LocalDateTime.now(), true);
-            ProyectoDTO proyecto2 = new ProyectoDTO(null, UUID.randomUUID(), "Proyecto Inicial 2", LocalDateTime.now(), true);
+            ProyectoDTO proyecto1 = new ProyectoDTO(null, UUID.randomUUID(), "Proyecto Inicial 1", LocalDateTime.now(),
+                    true);
+            ProyectoDTO proyecto2 = new ProyectoDTO(null, UUID.randomUUID(), "Proyecto Inicial 2", LocalDateTime.now(),
+                    true);
 
             crearProyecto(proyecto1);
             crearProyecto(proyecto2);
         }
+    }
+
+    /**
+     * Convierte una entidad Proyecto a un DTO ProyectoDTO.
+     */
+    private ProyectoDTO convertirAProyectoDTO(Proyecto proyecto) {
+        return new ProyectoDTO(
+                proyecto.getCodigoProyecto(),
+                proyecto.getUuid(),
+                proyecto.getNombre(),
+                proyecto.getFechaCreacion(),
+                proyecto.getEstado());
     }
 }
 
@@ -753,6 +774,7 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ProyectoDetalleService {
@@ -762,7 +784,7 @@ public class ProyectoDetalleService {
      * Este método es transaccional para garantizar la integridad de los datos.
      */
     @Transactional
-    public ProyectoDetalle crearProyectoDetalle(ProyectoDetalleDTO proyectoDetalleDTO) {
+    public ProyectoDetalleDTO crearProyectoDetalle(ProyectoDetalleDTO proyectoDetalleDTO) {
         ProyectoDetalle detalle = new ProyectoDetalle();
         detalle.setDescripcion(proyectoDetalleDTO.getDescripcion());
         detalle.setArea(proyectoDetalleDTO.getArea());
@@ -777,21 +799,24 @@ public class ProyectoDetalleService {
         }
 
         detalle.persist(); // Persiste el detalle en la base de datos
-        return detalle;
+        return convertirAProyectoDetalleDTO(detalle);
     }
 
     /**
      * Obtiene todos los detalles de proyectos almacenados en la base de datos.
      */
-    public List<ProyectoDetalle> obtenerTodosLosDetalles() {
-        return ProyectoDetalle.listAll();
+    public List<ProyectoDetalleDTO> obtenerTodosLosDetalles() {
+        return ProyectoDetalle.listAll().stream()
+                .map(proyectoDetalle -> convertirAProyectoDetalleDTO((ProyectoDetalle) proyectoDetalle)) // Casting explícito
+                .collect(Collectors.toList());
     }
 
     /**
      * Obtiene un detalle de proyecto por su ID.
      */
-    public Optional<ProyectoDetalle> obtenerDetallePorId(Long id) {
-        return ProyectoDetalle.findByIdOptional(id);
+    public Optional<ProyectoDetalleDTO> obtenerDetallePorId(Long id) {
+        return ProyectoDetalle.findByIdOptional(id)
+                .map(proyectoDetalle -> convertirAProyectoDetalleDTO((ProyectoDetalle) proyectoDetalle)); // Casting explícito
     }
 
     /**
@@ -799,7 +824,7 @@ public class ProyectoDetalleService {
      * Este método es transaccional para garantizar la integridad de los datos.
      */
     @Transactional
-    public ProyectoDetalle actualizarDetalle(Long id, ProyectoDetalleDTO proyectoDetalleDTO) {
+    public ProyectoDetalleDTO actualizarDetalle(Long id, ProyectoDetalleDTO proyectoDetalleDTO) {
         Optional<ProyectoDetalle> optionalDetalle = ProyectoDetalle.findByIdOptional(id);
         if (optionalDetalle.isPresent()) {
             ProyectoDetalle detalle = optionalDetalle.get();
@@ -815,7 +840,7 @@ public class ProyectoDetalleService {
                 throw new RuntimeException("Proyecto no encontrado con ID: " + proyectoDetalleDTO.getCodigoProyecto());
             }
 
-            return detalle;
+            return convertirAProyectoDetalleDTO(detalle);
         }
         return null;
     }
@@ -860,6 +885,19 @@ public class ProyectoDetalleService {
             }
         }
     }
+
+    /**
+     * Convierte una entidad ProyectoDetalle a un DTO ProyectoDetalleDTO.
+     */
+    private ProyectoDetalleDTO convertirAProyectoDetalleDTO(ProyectoDetalle detalle) {
+        return new ProyectoDetalleDTO(
+                detalle.getCodigoProyectoDetalle(),
+                detalle.getDescripcion(),
+                detalle.getArea(),
+                detalle.getEstado(),
+                detalle.getProyecto().getCodigoProyecto() // Solo incluir el ID del proyecto
+        );
+    }
 }
 
 === Contenido de ProyectoCombinadoResource.java ===
@@ -896,13 +934,13 @@ public class ProyectoCombinadoResource {
 package com.example.module.proyecto.resource;
 
 import com.example.module.proyecto.dto.ProyectoDetalleDTO;
-import com.example.module.proyecto.model.ProyectoDetalle;
 import com.example.module.proyecto.service.ProyectoDetalleService;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -916,12 +954,10 @@ public class ProyectoDetalleResource {
 
     /**
      * Endpoint para obtener todos los detalles de proyectos.
-     *
-     * @return Lista de detalles de proyectos.
      */
     @GET
     public Response obtenerTodosLosDetalles() {
-        List<ProyectoDetalle> detalles = proyectoDetalleService.obtenerTodosLosDetalles();
+        List<ProyectoDetalleDTO> detalles = proyectoDetalleService.obtenerTodosLosDetalles();
         if (detalles.isEmpty()) {
             return Response.status(Response.Status.NO_CONTENT)
                            .entity("No se encontraron detalles de proyecto.")
@@ -932,14 +968,11 @@ public class ProyectoDetalleResource {
 
     /**
      * Endpoint para obtener un detalle de proyecto por su ID.
-     *
-     * @param id ID del detalle de proyecto.
-     * @return Detalle de proyecto encontrado o respuesta 404 si no existe.
      */
     @GET
     @Path("/{id}")
     public Response obtenerDetallePorId(@PathParam("id") Long id) {
-        Optional<ProyectoDetalle> optionalDetalle = proyectoDetalleService.obtenerDetallePorId(id);
+        Optional<ProyectoDetalleDTO> optionalDetalle = proyectoDetalleService.obtenerDetallePorId(id);
         if (optionalDetalle.isPresent()) {
             return Response.ok(optionalDetalle.get()).build();
         }
@@ -950,14 +983,11 @@ public class ProyectoDetalleResource {
 
     /**
      * Endpoint para crear un nuevo detalle de proyecto.
-     *
-     * @param proyectoDetalleDTO Datos del detalle de proyecto a crear.
-     * @return Respuesta 201 Created con el detalle de proyecto creado.
      */
     @POST
     public Response crearProyectoDetalle(ProyectoDetalleDTO proyectoDetalleDTO) {
         try {
-            ProyectoDetalle detalle = proyectoDetalleService.crearProyectoDetalle(proyectoDetalleDTO);
+            ProyectoDetalleDTO detalle = proyectoDetalleService.crearProyectoDetalle(proyectoDetalleDTO);
             return Response.status(Response.Status.CREATED).entity(detalle).build();
         } catch (RuntimeException e) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -968,28 +998,21 @@ public class ProyectoDetalleResource {
 
     /**
      * Endpoint para actualizar un detalle de proyecto existente.
-     *
-     * @param id                  ID del detalle de proyecto a actualizar.
-     * @param proyectoDetalleDTO  Datos actualizados del detalle de proyecto.
-     * @return Respuesta 200 OK con el detalle de proyecto actualizado o 404 si no existe.
      */
     @PUT
     @Path("/{id}")
     public Response actualizarDetalle(@PathParam("id") Long id, ProyectoDetalleDTO proyectoDetalleDTO) {
-        ProyectoDetalle detalle = proyectoDetalleService.actualizarDetalle(id, proyectoDetalleDTO);
+        ProyectoDetalleDTO detalle = proyectoDetalleService.actualizarDetalle(id, proyectoDetalleDTO);
         if (detalle != null) {
             return Response.ok(detalle).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
-                       .entity("Detalle de proyecto con ID "  + id + " no encontrado.")
+                       .entity("Detalle de proyecto con ID " + id + " no encontrado.")
                        .build();
     }
 
     /**
      * Endpoint para eliminar un detalle de proyecto existente.
-     *
-     * @param id ID del detalle de proyecto a eliminar.
-     * @return Respuesta 204 No Content si se eliminó correctamente o 404 si no existe.
      */
     @DELETE
     @Path("/{id}")
@@ -1008,7 +1031,6 @@ public class ProyectoDetalleResource {
 package com.example.module.proyecto.resource;
 
 import com.example.module.proyecto.dto.ProyectoDTO;
-import com.example.module.proyecto.model.Proyecto;
 import com.example.module.proyecto.service.ProyectoService;
 
 import jakarta.inject.Inject;
@@ -1029,7 +1051,7 @@ public class ProyectoResource {
 
     @GET
     public Response obtenerTodosLosProyectos() {
-        List<Proyecto> proyectos = proyectoService.obtenerTodosLosProyectos();
+        List<ProyectoDTO> proyectos = proyectoService.obtenerTodosLosProyectos();
         if (proyectos.isEmpty()) {
             return Response.status(Response.Status.NO_CONTENT)
                     .entity("No se encontraron proyectos.")
@@ -1041,7 +1063,7 @@ public class ProyectoResource {
     @GET
     @Path("/{id}")
     public Response obtenerProyectoPorId(@PathParam("id") Long id) {
-        Optional<Proyecto> optionalProyecto = proyectoService.obtenerProyectoPorId(id);
+        Optional<ProyectoDTO> optionalProyecto = proyectoService.obtenerProyectoPorId(id);
         if (optionalProyecto.isPresent()) {
             return Response.ok(optionalProyecto.get()).build();
         }
@@ -1053,7 +1075,7 @@ public class ProyectoResource {
     @POST
     public Response crearProyecto(ProyectoDTO proyectoDTO) {
         try {
-            Proyecto proyecto = proyectoService.crearProyecto(proyectoDTO);
+            ProyectoDTO proyecto = proyectoService.crearProyecto(proyectoDTO);
             return Response.status(Response.Status.CREATED).entity(proyecto).build();
         } catch (RuntimeException e) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -1065,7 +1087,7 @@ public class ProyectoResource {
     @PUT
     @Path("/{id}")
     public Response actualizarProyecto(@PathParam("id") Long id, ProyectoDTO proyectoDTO) {
-        Proyecto proyecto = proyectoService.actualizarProyecto(id, proyectoDTO);
+        ProyectoDTO proyecto = proyectoService.actualizarProyecto(id, proyectoDTO);
         if (proyecto != null) {
             return Response.ok(proyecto).build();
         }
@@ -1088,7 +1110,7 @@ public class ProyectoResource {
 }
 
 === Contenido de ServiceQuery.java ===
-package com.example.module.query.service;
+package com.example.module.proyecto.service;
 
 
 
@@ -1158,7 +1180,7 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
-import com.example.module.query.service.ServiceQuery;
+import com.example.module.proyecto.service.ServiceQuery;
 
 
 

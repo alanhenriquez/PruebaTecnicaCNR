@@ -70,6 +70,8 @@
     padding: 1rem;
     box-sizing: inherit;
     position: relative;
+    flex-direction: column;
+    gap: 3.5rem;
   }
 
   .angular-logo {
@@ -178,7 +180,12 @@
 </style>
 
 <main class="main">
-  <app-tree-table></app-tree-table>
+  <div class="proyectos">
+    <app-proyectos></app-proyectos>
+  </div>
+  <div class="apiexternal">
+    <app-tree-table></app-tree-table>
+  </div>
 </main>
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->

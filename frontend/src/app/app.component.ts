@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ButtonDemoComponent } from "./button-demo/button-demo.component";
-import { TreeTableComponent } from "./components/tree-table/tree-table.component";
+import { ProyectosComponent } from "./proyectos/components/proyectos/proyectos.component";
+import { TreeTableComponent } from "./api-external/components/tree-table/tree-table.component";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TreeTableComponent],
+  imports: [RouterOutlet, ProyectosComponent, TreeTableComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })

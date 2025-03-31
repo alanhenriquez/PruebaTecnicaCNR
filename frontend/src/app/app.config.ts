@@ -24,7 +24,7 @@ export const appConfig: ApplicationConfig = {
                 preset: Aura, // Usa el tema "Aura"
                 options: {
                     prefix: 'p', // Prefijo para las clases CSS
-                    darkModeSelector: 'system', // Modo oscuro basado en el sistema
+                    darkModeSelector: 'light', // Modo oscuro basado en el sistema
                     cssLayer: false // Desactiva el uso de capas CSS
                 }
             },
