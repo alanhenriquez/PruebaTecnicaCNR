@@ -9,6 +9,7 @@ import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ApplicationScoped
 public class ProyectoDetalleService {
@@ -18,7 +19,7 @@ public class ProyectoDetalleService {
      * Este método es transaccional para garantizar la integridad de los datos.
      */
     @Transactional
-    public ProyectoDetalle crearProyectoDetalle(ProyectoDetalleDTO proyectoDetalleDTO) {
+    public ProyectoDetalleDTO crearProyectoDetalle(ProyectoDetalleDTO proyectoDetalleDTO) {
         ProyectoDetalle detalle = new ProyectoDetalle();
         detalle.setDescripcion(proyectoDetalleDTO.getDescripcion());
         detalle.setArea(proyectoDetalleDTO.getArea());
@@ -33,21 +34,24 @@ public class ProyectoDetalleService {
         }
 
         detalle.persist(); // Persiste el detalle en la base de datos
-        return detalle;
+        return convertirAProyectoDetalleDTO(detalle);
     }
 
     /**
      * Obtiene todos los detalles de proyectos almacenados en la base de datos.
      */
-    public List<ProyectoDetalle> obtenerTodosLosDetalles() {
-        return ProyectoDetalle.listAll();
+    public List<ProyectoDetalleDTO> obtenerTodosLosDetalles() {
+        return ProyectoDetalle.listAll().stream()
+                .map(proyectoDetalle -> convertirAProyectoDetalleDTO((ProyectoDetalle) proyectoDetalle)) // Casting explícito
+                .collect(Collectors.toList());
     }
 
     /**
      * Obtiene un detalle de proyecto por su ID.
      */
-    public Optional<ProyectoDetalle> obtenerDetallePorId(Long id) {
-        return ProyectoDetalle.findByIdOptional(id);
+    public Optional<ProyectoDetalleDTO> obtenerDetallePorId(Long id) {
+        return ProyectoDetalle.findByIdOptional(id)
+                .map(proyectoDetalle -> convertirAProyectoDetalleDTO((ProyectoDetalle) proyectoDetalle)); // Casting explícito
     }
 
     /**
@@ -55,7 +59,7 @@ public class ProyectoDetalleService {
      * Este método es transaccional para garantizar la integridad de los datos.
      */
     @Transactional
-    public ProyectoDetalle actualizarDetalle(Long id, ProyectoDetalleDTO proyectoDetalleDTO) {
+    public ProyectoDetalleDTO actualizarDetalle(Long id, ProyectoDetalleDTO proyectoDetalleDTO) {
         Optional<ProyectoDetalle> optionalDetalle = ProyectoDetalle.findByIdOptional(id);
         if (optionalDetalle.isPresent()) {
             ProyectoDetalle detalle = optionalDetalle.get();
@@ -71,7 +75,7 @@ public class ProyectoDetalleService {
                 throw new RuntimeException("Proyecto no encontrado con ID: " + proyectoDetalleDTO.getCodigoProyecto());
             }
 
-            return detalle;
+            return convertirAProyectoDetalleDTO(detalle);
         }
         return null;
     }
@@ -115,5 +119,18 @@ public class ProyectoDetalleService {
                 throw new RuntimeException("No se encontró el proyecto 'Proyecto Inicial 1' para inicializar detalles.");
             }
         }
+    }
+
+    /**
+     * Convierte una entidad ProyectoDetalle a un DTO ProyectoDetalleDTO.
+     */
+    private ProyectoDetalleDTO convertirAProyectoDetalleDTO(ProyectoDetalle detalle) {
+        return new ProyectoDetalleDTO(
+                detalle.getCodigoProyectoDetalle(),
+                detalle.getDescripcion(),
+                detalle.getArea(),
+                detalle.getEstado(),
+                detalle.getProyecto().getCodigoProyecto() // Solo incluir el ID del proyecto
+        );
     }
 }
