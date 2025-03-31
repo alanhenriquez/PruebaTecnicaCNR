@@ -1,7 +1,6 @@
 package com.example.module.proyecto.dto;
 
 public class ProyectoDetalleDTO {
-
     private Long codigoProyectoDetalle;
     private String descripcion;
     private Integer area;
@@ -19,6 +18,7 @@ public class ProyectoDetalleDTO {
         this.codigoProyecto = codigoProyecto;
     }
 
+    // Getters y setters
     public Long getCodigoProyectoDetalle() {
         return codigoProyectoDetalle;
     }

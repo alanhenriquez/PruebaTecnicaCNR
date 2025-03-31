@@ -1,1 +1,11 @@
 /* You can add global styles to this file, and also import other style files */
+@import "./../node_modules/primeicons/primeicons.css";
+
+td {
+    white-space: nowrap;
+    /* Evita que el texto se divida en múltiples líneas */
+    overflow: hidden;
+    /* Oculta el texto que excede el ancho */
+    text-overflow: ellipsis;
+    /* Agrega "..." al final del texto truncado */
+}

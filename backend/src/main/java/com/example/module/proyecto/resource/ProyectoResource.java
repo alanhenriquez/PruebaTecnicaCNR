@@ -1,7 +1,6 @@
 package com.example.module.proyecto.resource;
 
 import com.example.module.proyecto.dto.ProyectoDTO;
-import com.example.module.proyecto.model.Proyecto;
 import com.example.module.proyecto.service.ProyectoService;
 
 import jakarta.inject.Inject;
@@ -22,7 +21,7 @@ public class ProyectoResource {
 
     @GET
     public Response obtenerTodosLosProyectos() {
-        List<Proyecto> proyectos = proyectoService.obtenerTodosLosProyectos();
+        List<ProyectoDTO> proyectos = proyectoService.obtenerTodosLosProyectos();
         if (proyectos.isEmpty()) {
             return Response.status(Response.Status.NO_CONTENT)
                     .entity("No se encontraron proyectos.")
@@ -34,7 +33,7 @@ public class ProyectoResource {
     @GET
     @Path("/{id}")
     public Response obtenerProyectoPorId(@PathParam("id") Long id) {
-        Optional<Proyecto> optionalProyecto = proyectoService.obtenerProyectoPorId(id);
+        Optional<ProyectoDTO> optionalProyecto = proyectoService.obtenerProyectoPorId(id);
         if (optionalProyecto.isPresent()) {
             return Response.ok(optionalProyecto.get()).build();
         }
@@ -46,7 +45,7 @@ public class ProyectoResource {
     @POST
     public Response crearProyecto(ProyectoDTO proyectoDTO) {
         try {
-            Proyecto proyecto = proyectoService.crearProyecto(proyectoDTO);
+            ProyectoDTO proyecto = proyectoService.crearProyecto(proyectoDTO);
             return Response.status(Response.Status.CREATED).entity(proyecto).build();
         } catch (RuntimeException e) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -58,7 +57,7 @@ public class ProyectoResource {
     @PUT
     @Path("/{id}")
     public Response actualizarProyecto(@PathParam("id") Long id, ProyectoDTO proyectoDTO) {
-        Proyecto proyecto = proyectoService.actualizarProyecto(id, proyectoDTO);
+        ProyectoDTO proyecto = proyectoService.actualizarProyecto(id, proyectoDTO);
         if (proyecto != null) {
             return Response.ok(proyecto).build();
         }

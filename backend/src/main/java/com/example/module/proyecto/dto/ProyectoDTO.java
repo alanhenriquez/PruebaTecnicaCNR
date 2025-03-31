@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ProyectoDTO {
-
     private Long codigoProyecto;
     private UUID uuid;
     private String nombre;
@@ -22,6 +21,7 @@ public class ProyectoDTO {
         this.estado = estado;
     }
 
+    // Getters y setters
     public Long getCodigoProyecto() {
         return codigoProyecto;
     }
