@@ -61,6 +61,26 @@
             <artifactId>quarkus-hibernate-orm</artifactId>
         </dependency>
 
+        <!-- Dependencia para Validación de Datos -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-hibernate-validator</artifactId>
+        </dependency>
+
+        <!-- Dependencia para Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Dependencia para OpenAPI (Documentación de la API) -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-openapi</artifactId>
+        </dependency>
+
         <!-- Dependencias para pruebas -->
         <dependency>
             <groupId>io.quarkus</groupId>

@@ -1,8 +1,6 @@
-package com.example.resource;
+package com.example.module.query.resource;
 
 
-
-import com.example.services.ServiceQuery;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -10,6 +8,8 @@ import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.Map;
+
+import com.example.module.query.service.ServiceQuery;
 
 
 
